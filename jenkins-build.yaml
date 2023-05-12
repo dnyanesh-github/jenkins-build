@@ -1,56 +1,12 @@
 ---
-- name: Create VM and Install Jenkins
-  hosts: localhost
-  connection: local
-  become: yes
-  gather_facts: no
-
+- name: Install Jenkins on Fedora
+  hosts: all
+  become: true
   vars:
-    vm_name: jenkins
-    vm_ram: 2048
-    vm_cpus: 2
-    vm_disk_size: 10000
-    vm_iso_path: D:\ISOs\Fedora-Workstation-Live-x86_64-38-1.6.iso
     jenkins_admin_username: admin
     jenkins_admin_password: admin123
 
   tasks:
-    - name: Create VM
-      vboxmanage:
-        vm_name: "{{ vm_name }}"
-        state: powered_off
-        ostype: Fedora_64
-        memory: "{{ vm_ram }}"
-        cpus: "{{ vm_cpus }}"
-        boot_order: dvd,hd
-        boot1: dvd
-        boot2: disk
-        boot3: none
-        boot4: none
-        ide_controller: SATA
-        sata_controller: SATA
-        sata_port_count: 1
-        hard_drive_file: "{{ vm_name }}.vdi"
-        hard_drive_size: "{{ vm_disk_size }}"
-
-    - name: Add CD-ROM Drive to VM
-      vboxmanage_guest_iso:
-        vm_name: "{{ vm_name }}"
-        storage_ctl: ide_controller
-        state: present
-        path: "{{ vm_iso_path }}"
-
-    - name: Start VM
-      vboxmanage:
-        vm_name: "{{ vm_name }}"
-        state: running
-
-    - name: Wait for VM to boot up
-      wait_for:
-        host: "{{ vm_name }}"
-        port: 22
-        timeout: 300
-
     - name: Install Jenkins dependencies
       dnf:
         name:
